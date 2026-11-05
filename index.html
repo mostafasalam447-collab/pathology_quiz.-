@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>General Pathology Quiz</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:#eef2f7;color:#0f172a;line-height:1.6;padding-bottom:60px}
+#err{display:none;background:#fee2e2;color:#991b1b;padding:12px 16px;font-size:14px;direction:ltr}
+.wrap{max-width:820px;margin:0 auto;padding:0 12px}
+.hero{background:linear-gradient(135deg,#0e7490,#0891b2);color:#fff;border-radius:0 0 22px 22px;padding:28px 18px 22px;text-align:center}
+.hero h1{font-size:26px;margin-bottom:4px}
+.hero p{opacity:.9;font-size:14px}
+.hero .by{margin-top:6px;font-weight:700;letter-spacing:.04em}
+.filters{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:16px 0 6px}
+.fbtn{padding:8px 14px;border-radius:20px;border:2px solid #0e7490;background:#fff;color:#0e7490;font-weight:700;font-size:13px;cursor:pointer}
+.fbtn.active{background:#0e7490;color:#fff}
+.count{text-align:center;color:#475569;font-size:14px;margin-bottom:6px}
+.bar{position:sticky;top:0;z-index:50;background:#0f172a;color:#fff;padding:8px 12px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.bar-in{max-width:820px;margin:0 auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;font-weight:700}
+.bar .pill{background:rgba(255,255,255,.12);padding:3px 10px;border-radius:14px}
+.pg{flex:1;min-width:60px;height:6px;background:rgba(255,255,255,.2);border-radius:6px;overflow:hidden}
+.pg i{display:block;height:100%;width:0;background:#22d3ee;transition:width .3s}
+.sec{margin:26px 0 6px;text-align:center;font-weight:700;color:#0e7490;font-size:14px;background:#e0f2fe;border:1px solid #bae6fd;border-radius:12px;padding:8px 12px}
+.card{background:#fff;border-radius:16px;padding:18px 16px;margin:12px 0;box-shadow:0 2px 12px rgba(15,23,42,.08);border-right:6px solid #cbd5e1}
+.card.ok{border-right-color:#10b981}.card.no{border-right-color:#ef4444}
+.qh{display:flex;align-items:center;gap:8px;margin-bottom:10px;direction:ltr}
+.qn{background:#0e7490;color:#fff;min-width:32px;height:32px;border-radius:16px;padding:0 8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.tag{background:#e0f2fe;color:#0e7490;border-radius:12px;padding:2px 10px;font-size:12px;font-weight:700}
+.qt{font-size:16px;font-weight:700;direction:ltr;text-align:left;margin-bottom:12px}
+.fig{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:6px;margin-bottom:12px;direction:ltr}
+
+.hint{font-size:13px;color:#0e7490;margin-bottom:8px}
+.opts{display:flex;flex-direction:column;gap:8px;direction:ltr}
+.opt{display:flex;align-items:center;gap:10px;text-align:left;width:100%;padding:11px 12px;border:2px solid #e2e8f0;border-radius:12px;background:#fff;font-size:15px;cursor:pointer;color:#1e293b}
+.opt b{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:13px;background:#f1f5f9;border:2px solid #cbd5e1;font-size:12px;flex-shrink:0}
+.opt.sel{border-color:#0e7490;background:#ecfeff}
+.opt.right{border-color:#10b981;background:#ecfdf5;color:#065f46;font-weight:700}
+.opt.right b{background:#10b981;border-color:#10b981;color:#fff}
+.opt.bad{border-color:#ef4444;background:#fef2f2;color:#7f1d1d}
+.opt.bad b{background:#ef4444;border-color:#ef4444;color:#fff}
+.inp{width:100%;padding:11px 12px;border:2px solid #e2e8f0;border-radius:12px;font-size:15px;margin-bottom:8px;direction:ltr}
+.inp.ok{border-color:#10b981;background:#ecfdf5}.inp.no{border-color:#ef4444;background:#fef2f2}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.btn{padding:10px 18px;border:0;border-radius:12px;background:#0e7490;color:#fff;font-weight:700;font-size:14px;cursor:pointer}
+.btn.gh{background:#e2e8f0;color:#334155}.btn.g{background:#059669}.btn.r{background:#dc2626}
+.btn:disabled{opacity:.5;cursor:default}
+.solbox{display:none;margin-top:12px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:10px;direction:ltr;font-size:14px}
+.solbox .ans{font-weight:700;color:#0e7490;border-bottom:1px dashed #bae6fd;padding-bottom:6px;margin-bottom:6px}
+.grade{display:none;margin-top:10px}
+.fb{display:none;margin-top:12px;padding:10px 12px;border-radius:10px;font-size:14px}
+.fb.ok{background:#ecfdf5;color:#065f46;border-right:4px solid #10b981}
+.fb.no{background:#fef2f2;color:#7f1d1d;border-right:4px solid #ef4444}
+.note{margin-top:6px;padding:6px 10px;background:#fffbeb;border:1px solid #fcd34d;color:#92400e;border-radius:8px}
+.sub{display:block}
+#result{display:none;background:#fff;border-radius:18px;padding:22px 16px;margin:20px 0;text-align:center;box-shadow:0 4px 20px rgba(15,23,42,.12)}
+#result h2{margin-bottom:6px}
+.big{font-size:44px;font-weight:900;color:#0e7490}
+.stats{display:flex;gap:10px;justify-content:center;margin:14px 0}
+.stat{flex:1;border-radius:12px;padding:10px;font-weight:700}
+.stat.c{background:#ecfdf5;color:#059669}.stat.w{background:#fef2f2;color:#dc2626}.stat.p{background:#fffbeb;color:#d97706}
+.rev{text-align:right;margin-top:14px}
+.ri{background:#fef2f2;border-right:4px solid #ef4444;border-radius:10px;padding:10px;margin-bottom:8px;font-size:14px}
+.ri .q{font-weight:700;direction:ltr;text-align:left}
+.sbtn{display:block;margin:20px auto 0;padding:14px 50px;font-size:16px}
+
+.qt{overflow-wrap:anywhere}
+.flab{text-align:center;color:#475569;font-size:12px;font-weight:700;margin-top:10px}
+.frow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0}
+</style>
+</head>
+<body>
+<div id="err"></div>
+<div class="hero">
+  <h1>🔬 General Pathology Quiz</h1>
+  <p>Lectures 1–4 · Cell Injury · Acute Inflammation · Suppurative Inflammation</p>
+  <p class="by">BY MOSTAFA SALLAM</p>
+</div>
+<div class="wrap">
+  <div class="flab">المحاضرة</div>
+  <div class="frow" id="lF">
+    <button class="fbtn active" data-v="all">📚 الكل</button>
+    <button class="fbtn" data-v="1">Lecture 1</button>
+    <button class="fbtn" data-v="2">Lecture 2</button>
+    <button class="fbtn" data-v="3">Lecture 3</button>
+    <button class="fbtn" data-v="4">Lecture 4</button>
+  </div>
+  <div class="flab">نوع الأسئلة</div>
+  <div class="frow" id="kF">
+    <button class="fbtn active" data-v="all">الكل</button>
+    <button class="fbtn" data-v="mcq">MCQ</button>
+    <button class="fbtn" data-v="tf">True / False</button>
+  </div>
+  <div class="count">عدد الأسئلة: <b id="qCount">0</b></div>
+</div>
+<div class="bar"><div class="bar-in">
+  <span class="pill" id="sNum">0/0</span><span class="pill" id="sC">✅ 0</span><span class="pill" id="sW">❌ 0</span><span class="pill" id="sP">📊 0%</span>
+  <div class="pg"><i id="sFill"></i></div>
+</div></div>
+<div class="wrap">
+  <div id="cards"><div class="card" style="text-align:center;direction:rtl">⏳ جاري تحميل الأسئلة...<br><small>لو الرسالة دي فضلت ظاهرة يبقى الكود اتنسخ ناقص أو الصفحة مش مفتوحة من رابط github.io.</small></div></div>
+  <button class="btn sbtn" id="submitBtn" disabled>عرض النتيجة 🎯</button>
+  <div id="result">
+    <h2>🎉 النتيجة</h2>
+    <div class="big"><span id="rScore">0</span> / <span id="rTotal">0</span></div>
+    <div id="rMsg"></div>
+    <div class="stats"><div class="stat c">✅ صح<br><span id="rC">0</span></div><div class="stat w">❌ غلط<br><span id="rW">0</span></div><div class="stat p">📊 النسبة<br><span id="rP">0%</span></div></div>
+    <div class="btns" style="justify-content:center"><button class="btn" id="againBtn">🔄 إعادة الاختبار</button><button class="btn gh" id="topBtn">🏠 للأعلى</button></div>
+    <div class="rev" id="rev"></div>
+  </div>
+</div>
+<script>
+window.onerror=function(m,s,l){var e=document.getElementById('err');if(e){e.style.display='block';e.textContent='JS error: '+m+' (line '+l+')';}};
+var L='ABCD'.split('');
+var SECS={
+"l1m": {
+"l": "1",
+"k": "mcq",
+"tag": "L1 · MCQ",
+"title": "General Pathology – Lecture 1 — Section A – Multiple-Choice Questions"
+},
+"l1t": {
+"l": "1",
+"k": "tf",
+"tag": "L1 · True/False",
+"title": "General Pathology – Lecture 1 — Section B – True or False"
+},
+"l2m": {
+"l": "2",
+"k": "mcq",
+"tag": "L2 · MCQ",
+"title": "Lecture 2 — Acute Inflammation — Section A — Multiple Choice Questions (20 Questions)"
+},
+"l2t": {
+"l": "2",
+"k": "tf",
+"tag": "L2 · True/False",
+"title": "Lecture 2 — Acute Inflammation — Section B — True or False (20 Questions)"
+},
+"l3m": {
+"l": "3",
+"k": "mcq",
+"tag": "L3 · MCQ",
+"title": "General Pathology – Lecture 3 — Section A – Multiple-Choice Questions (20)"
+},
+"l3t": {
+"l": "3",
+"k": "tf",
+"tag": "L3 · True/False",
+"title": "General Pathology – Lecture 3 — Section B – True / False (20)"
+},
+"l4m": {
+"l": "4",
+"k": "mcq",
+"tag": "L4 · MCQ",
+"title": "Lecture 4 — Suppurative Inflammation — Part I – Multiple Choice Questions (20 Questions)"
+},
+"l4t": {
+"l": "4",
+"k": "tf",
+"tag": "L4 · True/False",
+"title": "Lecture 4 — Suppurative Inflammation — Part II – True or False (20 Questions)"
+}
+};
+var ALL=[
+{"n":1,"sec":"l1m","num":"1","q":"Pathology is best defined in the lecture as the study of:","o":["Normal body functions only","Disease and suffering","Drug actions","Surgical procedures"],"c":1},
+{"n":2,"sec":"l1m","num":"2","q":"Pathology is divided into which two main approaches in the lecture?","o":["Clinical and laboratory pathology","General and special/system pathology","Acute and chronic pathology","Medical and surgical pathology"],"c":1},
+{"n":3,"sec":"l1m","num":"3","q":"Pathological anatomy is mainly concerned with the study of:","o":["Morphology and structure","Drug metabolism","Patient behavior","Blood pressure regulation"],"c":0},
+{"n":4,"sec":"l1m","num":"4","q":"The term “etiology” refers to:","o":["The outcome of a disease","The cause of a disease","The structural appearance of a cell","The symptoms experienced by a patient"],"c":1},
+{"n":5,"sec":"l1m","num":"5","q":"Which term describes the mechanisms, development, progress, and outcome of a disease?","o":["Nosology","Pathogenesis","Anatomy","Prognosis"],"c":1},
+{"n":6,"sec":"l1m","num":"6","q":"Which of the following is an objective, measurable finding?","o":["Headache","Nausea","Sign","Dizziness"],"c":2},
+{"n":7,"sec":"l1m","num":"7","q":"A collection of signs and symptoms occurring together is called a:","o":["Syndrome","Sequela","Relapse","Remission"],"c":0},
+{"n":8,"sec":"l1m","num":"8","q":"A disease with a rapid onset is described as:","o":["Chronic","Acute","Latent","Recurrent"],"c":1},
+{"n":9,"sec":"l1m","num":"9","q":"The period in which early, nonspecific symptoms may appear before the fully expressed clinical picture is the:","o":["Outcome period","Prodromal period","Recovery period","Chronic period"],"c":1},
+{"n":10,"sec":"l1m","num":"10","q":"Which of the following is listed as an outcome of disease?","o":["Complete or incomplete recovery","Hyperplasia only","Vasodilatation only","Chemotaxis only"],"c":0},
+{"n":11,"sec":"l1m","num":"11","q":"Hypoxia means:","o":["Increased oxygen supply to tissues","Decreased oxygen supply to tissues","Increased blood glucose","Increased tissue temperature"],"c":1},
+{"n":12,"sec":"l1m","num":"12","q":"Which of the following is a cause of cellular injury mentioned in the lecture?","o":["Physical agents such as heat and radiation","Normal sleep","Normal hydration","Physiological cell renewal"],"c":0},
+{"n":13,"sec":"l1m","num":"13","q":"An increase in the size of individual cells is called:","o":["Hyperplasia","Atrophy","Hypertrophy","Metaplasia"],"c":2},
+{"n":14,"sec":"l1m","num":"14","q":"Which mediator is derived from mast cells, basophils, and platelets?","o":["Histamine","Bradykinin","Plasmin","Fibrin"],"c":0},
+{"n":15,"sec":"l1m","num":"15","q":"The vascular phase of acute inflammation is associated with:","o":["Formation of inflammatory fluid exudate","Decreased blood flow only","Complete absence of vascular changes","Formation of a tumor"],"c":0},
+{"n":16,"sec":"l1t","num":"1","q":"Pathology includes the study of both pathological physiology and pathological anatomy.","o":["True","False"],"c":0},
+{"n":17,"sec":"l1t","num":"2","q":"Nosology is concerned with systematically describing and classifying diseases.","o":["True","False"],"c":0},
+{"n":18,"sec":"l1t","num":"3","q":"Etiology describes the mechanisms by which a disease develops.","o":["True","False"],"c":1},
+{"n":19,"sec":"l1t","num":"4","q":"A symptom is generally subjective and may vary from person to person.","o":["True","False"],"c":0},
+{"n":20,"sec":"l1t","num":"5","q":"A syndrome is a collection of signs and symptoms that occur together.","o":["True","False"],"c":0},
+{"n":21,"sec":"l1t","num":"6","q":"Chronic disease is described in the lecture as having a rapid onset and short duration.","o":["True","False"],"c":1},
+{"n":22,"sec":"l1t","num":"7","q":"A relapse is the return of a disease or its signs and symptoms after a period of improvement.","o":["True","False"],"c":0},
+{"n":23,"sec":"l1t","num":"8","q":"The latent stage is listed as the first stage in the stages of disease.","o":["True","False"],"c":0},
+{"n":24,"sec":"l1t","num":"9","q":"Disease may end in recovery, transition to a chronic form, or death.","o":["True","False"],"c":0},
+{"n":25,"sec":"l1t","num":"10","q":"Anemia may cause hypoxia by reducing the oxygen-carrying capacity of blood.","o":["True","False"],"c":0},
+{"n":26,"sec":"l1t","num":"11","q":"Reversible cell injury is also called degeneration in the lecture.","o":["True","False"],"c":0},
+{"n":27,"sec":"l1t","num":"12","q":"Apoptosis is described in the lecture as cell death caused by an irritant.","o":["True","False"],"c":1},
+{"n":28,"sec":"l1t","num":"13","q":"Hyperplasia means an increase in the number of cells.","o":["True","False"],"c":0},
+{"n":29,"sec":"l1t","num":"14","q":"Inflammation is a protective response that can help eliminate damaged tissue and initiate healing.","o":["True","False"],"c":0},
+{"n":30,"sec":"l1t","num":"15","q":"Vascular stasis facilitates leukocyte exudation, but it may also contribute to thrombosis.","o":["True","False"],"c":0},
+{"n":31,"sec":"l2m","num":"1","q":"Which two main phases are included in the acute inflammatory response?","o":["Degenerative and regenerative phases","Vascular and cellular phases","Neural and hormonal phases","Coagulation and healing phases"],"c":1},
+{"n":32,"sec":"l2m","num":"2","q":"The cellular phase of acute inflammation mainly involves exudation of:","o":["Red blood cells only","Platelets only","Blood leukocytes, mainly neutrophils and monocytes","Fibroblasts only"],"c":2},
+{"n":33,"sec":"l2m","num":"3","q":"Which of the following is a source of chemical mediators of inflammation?","o":["Cells","Plasma","Bacteria","All of the above"],"c":3},
+{"n":34,"sec":"l2m","num":"4","q":"Histamine is mainly derived from:","o":["Mast cells, basophils and platelets","Neutrophils only","Fibroblasts and endothelial cells","T lymphocytes only"],"c":0},
+{"n":35,"sec":"l2m","num":"5","q":"According to the lecture, serotonin is derived from:","o":["Macrophages and neutrophils","Argentaffin cells and platelets","Mast cells only","Monocytes only"],"c":1},
+{"n":36,"sec":"l2m","num":"6","q":"Prostaglandins are classified as:","o":["Plasma factors","Bacterial products","Arachidonic acid metabolites","Lysosomal enzymes"],"c":2},
+{"n":37,"sec":"l2m","num":"7","q":"Leukotrienes are described in the lecture as being derived from:","o":["Neutrophils","Platelets","Fibroblasts","Endothelial cells"],"c":0},
+{"n":38,"sec":"l2m","num":"8","q":"Which cytokines are listed as being derived from monocytes?","o":["IL-2 only","TNF and IL-1","Histamine and serotonin","Bradykinin and plasmin"],"c":1},
+{"n":39,"sec":"l2m","num":"9","q":"Which of the following is a plasma factor involved in inflammation?","o":["Histamine","Leukotriene","Bradykinin","Serotonin"],"c":2},
+{"n":40,"sec":"l2m","num":"10","q":"Plasmin is associated with which system?","o":["Complement system","Fibrinolytic system","Clotting system","Kinin system"],"c":1},
+{"n":41,"sec":"l2m","num":"11","q":"Which mediators are mentioned as causing vasodilatation?","o":["Histamine and prostaglandins","Leukotrienes only","Plasmin and fibrin","TNF and IL-2 only"],"c":0},
+{"n":42,"sec":"l2m","num":"12","q":"The initial vascular response to irritation is usually:","o":["Permanent vasodilatation","Transient vasoconstriction","Immediate vascular stasis","Complete vascular obstruction"],"c":1},
+{"n":43,"sec":"l2m","num":"13","q":"Vasodilatation in acute inflammation leads to:","o":["Decreased blood flow and pallor","Increased blood flow, redness and hotness","Reduced capillary opening","Decreased vascular permeability"],"c":1},
+{"n":44,"sec":"l2m","num":"14","q":"Endothelial cell contraction and retraction cause:","o":["Narrowing of intercellular junctions","Widening of intercellular junctions and formation of gaps","Complete closure of capillaries","Decreased leakage of fluid"],"c":1},
+{"n":45,"sec":"l2m","num":"15","q":"Vascular slowing (stasis) is partly caused by:","o":["Decreased blood viscosity","Increased blood viscosity due to vascular leakage","Closure of the capillary bed","Reduced vascular permeability"],"c":1},
+{"n":46,"sec":"l2m","num":"16","q":"Why is stasis important in acute inflammation?","o":["It prevents leukocytes from contacting the vessel wall","It allows leukocytes to leave blood vessels more easily","It stops exudate formation","It prevents vasodilatation"],"c":1},
+{"n":47,"sec":"l2m","num":"17","q":"Inflammatory fluid exudate is characterized by:","o":["Low protein content below 1 g/dL","Protein content above 3 g/dL","Specific gravity below 1.010","Absence of plasma proteins"],"c":1},
+{"n":48,"sec":"l2m","num":"18","q":"Compared with exudate, transudate generally has:","o":["Higher protein content","More inflammatory cells","Lower protein content and lower specific gravity","High fibrinogen content"],"c":2},
+{"n":49,"sec":"l2m","num":"19","q":"Which of the following is a function of exudate?","o":["Diluting bacterial toxins and chemical irritants","Preventing antibodies from reaching the area","Blocking all movement of phagocytic cells","Preventing tissue repair"],"c":0},
+{"n":50,"sec":"l2m","num":"20","q":"According to the lecture, fluid exudate is mainly absorbed by:","o":["Arteries","Lymphatics","Nerves","Sweat glands"],"c":1},
+{"n":51,"sec":"l2t","num":"1","q":"The acute inflammatory response includes a vascular phase and a cellular phase.","o":["True","False"],"c":0},
+{"n":52,"sec":"l2t","num":"2","q":"The cellular phase includes the exudation of leukocytes, mainly neutrophils and monocytes.","o":["True","False"],"c":0},
+{"n":53,"sec":"l2t","num":"3","q":"Chemical mediators may be derived from cells, plasma or bacteria.","o":["True","False"],"c":0},
+{"n":54,"sec":"l2t","num":"4","q":"Histamine is derived from mast cells, basophils and platelets.","o":["True","False"],"c":0},
+{"n":55,"sec":"l2t","num":"5","q":"Serotonin is derived only from neutrophils.","o":["True","False"],"c":1},
+{"n":56,"sec":"l2t","num":"6","q":"Prostaglandins are arachidonic acid metabolites.","o":["True","False"],"c":0},
+{"n":57,"sec":"l2t","num":"7","q":"Leukotrienes are listed as being derived from neutrophils.","o":["True","False"],"c":0},
+{"n":58,"sec":"l2t","num":"8","q":"Cytokines such as IL-2 may be derived from lymphocytes.","o":["True","False"],"c":0},
+{"n":59,"sec":"l2t","num":"9","q":"Bradykinin is classified as a cell-derived vasoactive amine.","o":["True","False"],"c":1},
+{"n":60,"sec":"l2t","num":"10","q":"The complement, clotting and fibrinolytic systems are listed among plasma factors.","o":["True","False"],"c":0},
+{"n":61,"sec":"l2t","num":"11","q":"Leukotrienes are given as an example of mediators causing chemotaxis.","o":["True","False"],"c":0},
+{"n":62,"sec":"l2t","num":"12","q":"The first vascular change is transient vasodilatation followed by vasoconstriction.","o":["True","False"],"c":1},
+{"n":63,"sec":"l2t","num":"13","q":"Vasodilatation increases blood flow and contributes to redness and hotness.","o":["True","False"],"c":0},
+{"n":64,"sec":"l2t","num":"14","q":"Endothelial injury may be direct or leukocyte-mediated.","o":["True","False"],"c":0},
+{"n":65,"sec":"l2t","num":"15","q":"Vascular leakage and opening of the capillary bed contribute to stasis.","o":["True","False"],"c":0},
+{"n":66,"sec":"l2t","num":"16","q":"Rapid blood flow makes it easier for leukocytes to leave blood vessels.","o":["True","False"],"c":1},
+{"n":67,"sec":"l2t","num":"17","q":"Exudate is a protein-rich fluid, with protein content above 3 g/dL according to the lecture.","o":["True","False"],"c":0},
+{"n":68,"sec":"l2t","num":"18","q":"Transudate has a higher protein content than inflammatory exudate.","o":["True","False"],"c":1},
+{"n":69,"sec":"l2t","num":"19","q":"Fibrin formed from fibrinogen helps localize infection and provides a network for phagocytic cells.","o":["True","False"],"c":0},
+{"n":70,"sec":"l2t","num":"20","q":"Bacteria in exudate may cause inflammation of lymphatic vessels or draining lymph nodes.","o":["True","False"],"c":0},
+{"n":71,"sec":"l3m","num":"1","q":"Cell injury occurs when:","o":["Cells are exposed to mild physiological stimuli","Stresses exceed the ability of cells to adapt","Cells complete normal differentiation","Tissue repair is fully completed"],"c":1},
+{"n":72,"sec":"l3m","num":"2","q":"Which of the following is an example of hypoxia due to ischemia?","o":["Carbon monoxide poisoning","Anaemia","Arterial thrombosis","Respiratory failure"],"c":2},
+{"n":73,"sec":"l3m","num":"3","q":"Which outcome represents irreversible cell injury?","o":["Reversible degeneration","Cellular adaptation","Cell death","Intracellular accumulation"],"c":2},
+{"n":74,"sec":"l3m","num":"4","q":"Atrophy is defined as:","o":["Increase in cell size","Increase in cell number","Shrinkage of cell size","Transformation of one cell type into another"],"c":2},
+{"n":75,"sec":"l3m","num":"5","q":"Hyperplasia refers to:","o":["Increase in the number of cells","Increase in the size of cells","Abnormal cell shape","Decrease in cell size"],"c":0},
+{"n":76,"sec":"l3m","num":"6","q":"Inflammation is best defined as:","o":["Reaction of living vascularized tissue to injury","Proliferation of abnormal cells","Death of all cells in a tissue","Deposition of calcium in tissues"],"c":0},
+{"n":77,"sec":"l3m","num":"7","q":"The suffix used to denote inflammation of an organ is:","o":["-osis","-itis","-oma","-plasia"],"c":1},
+{"n":78,"sec":"l3m","num":"8","q":"Acute inflammation is usually characterized by:","o":["Gradual onset and years of duration","Rapid onset and short duration","Absence of vascular changes","Exclusive involvement of lymphocytes"],"c":1},
+{"n":79,"sec":"l3m","num":"9","q":"Which of the following is a cell-derived vasoactive amine?","o":["Bradykinin","Complement C5a","Histamine","Plasmin"],"c":2},
+{"n":80,"sec":"l3m","num":"10","q":"Histamine is mainly derived from:","o":["Mast cells, basophils and platelets","Neutrophils only","Fibroblasts only","Red blood cells"],"c":0},
+{"n":81,"sec":"l3m","num":"11","q":"Which mediator is listed in the lecture as a chemotactic factor?","o":["Leukotrienes","Albumin","Haemoglobin","Insulin"],"c":0},
+{"n":82,"sec":"l3m","num":"12","q":"The initial vascular response to irritation is usually:","o":["Permanent vasoconstriction","Transient vasoconstriction followed by vasodilatation","Immediate thrombosis in every case","Complete cessation of blood flow"],"c":1},
+{"n":83,"sec":"l3m","num":"13","q":"Vasodilatation in acute inflammation causes:","o":["Pallor and coldness","Reduced blood flow","Hyperemia, redness and hotness","Decreased capillary bed opening"],"c":2},
+{"n":84,"sec":"l3m","num":"14","q":"Exudate is characterized by:","o":["Low protein content and low specific gravity","High protein content and increased specific gravity","Absence of inflammatory cells in all cases","Inability to contain fibrinogen"],"c":1},
+{"n":85,"sec":"l3m","num":"15","q":"Which statement about transudate is correct according to the lecture?","o":["It is rich in fibrinogen","It undergoes clotting","It has low protein content and does not clot","It has a specific gravity above 1015"],"c":2},
+{"n":86,"sec":"l3m","num":"16","q":"Vascular stasis is important because it:","o":["Prevents leukocytes from reaching the vessel wall","Allows leukocytes to leave the blood vessels","Stops exudate formation","Prevents capillary opening"],"c":1},
+{"n":87,"sec":"l3m","num":"17","q":"During margination, leukocytes:","o":["Move away from the vessel wall to the center","Line the endothelial surface","Become red blood cells","Immediately form antibodies"],"c":1},
+{"n":88,"sec":"l3m","num":"18","q":"In most acute inflammatory reactions, which cells emigrate first?","o":["Monocytes","Lymphocytes","Neutrophils","Fibroblasts"],"c":2},
+{"n":89,"sec":"l3m","num":"19","q":"Opsonization helps phagocytosis by:","o":["Coating bacteria with immunoglobulin or complement","Preventing attachment of leukocytes","Dissolving the basement membrane","Inhibiting lysosomal enzymes"],"c":0},
+{"n":90,"sec":"l3m","num":"20","q":"The fusion of a phagosome with lysosomal granules forms a:","o":["Thrombus","Phagolysosome","Transudate","Granuloma"],"c":1},
+{"n":91,"sec":"l3t","num":"1","q":"Cell injury may initially be reversible before progressing to irreversible injury.","o":["True","False"],"c":0},
+{"n":92,"sec":"l3t","num":"2","q":"Hypoxia can result from reduced blood supply, inadequate oxygenation, or reduced oxygen-carrying capacity.","o":["True","False"],"c":0},
+{"n":93,"sec":"l3t","num":"3","q":"Apoptosis is described in the lecture as cell suicide.","o":["True","False"],"c":0},
+{"n":94,"sec":"l3t","num":"4","q":"Metaplasia is an increase in the number of cells.","o":["True","False"],"c":1},
+{"n":95,"sec":"l3t","num":"5","q":"Inflammation is always harmful and has no protective role.","o":["True","False"],"c":1},
+{"n":96,"sec":"l3t","num":"6","q":"The suffix “-itis” is added to the name of an organ to indicate inflammation.","o":["True","False"],"c":0},
+{"n":97,"sec":"l3t","num":"7","q":"Chronic inflammation generally has a gradual onset and may last for months or years.","o":["True","False"],"c":0},
+{"n":98,"sec":"l3t","num":"8","q":"Cytokines such as TNF and IL-1 may be derived from monocytes.","o":["True","False"],"c":0},
+{"n":99,"sec":"l3t","num":"9","q":"Bradykinin is listed among plasma-derived inflammatory mediators.","o":["True","False"],"c":0},
+{"n":100,"sec":"l3t","num":"10","q":"Histamine causes vasoconstriction and decreases vascular permeability.","o":["True","False"],"c":1},
+{"n":101,"sec":"l3t","num":"11","q":"Vasodilatation increases blood flow and contributes to redness and hotness.","o":["True","False"],"c":0},
+{"n":102,"sec":"l3t","num":"12","q":"Increased vascular permeability contributes to the formation of protein-rich exudate.","o":["True","False"],"c":0},
+{"n":103,"sec":"l3t","num":"13","q":"Exudate normally has lower protein content than transudate.","o":["True","False"],"c":1},
+{"n":104,"sec":"l3t","num":"14","q":"Fibrinogen in exudate can be converted to fibrin and help localize infection.","o":["True","False"],"c":0},
+{"n":105,"sec":"l3t","num":"15","q":"Fluid exudate may be absorbed by lymphatics.","o":["True","False"],"c":0},
+{"n":106,"sec":"l3t","num":"16","q":"Margination occurs when leukocytes move from the central blood column toward the vessel wall.","o":["True","False"],"c":0},
+{"n":107,"sec":"l3t","num":"17","q":"Monocytes usually emigrate before neutrophils in acute inflammation.","o":["True","False"],"c":1},
+{"n":108,"sec":"l3t","num":"18","q":"Chemotaxis is the directed movement of leukocytes toward the site of injury.","o":["True","False"],"c":0},
+{"n":109,"sec":"l3t","num":"19","q":"Phagocytosis includes recognition and attachment, engulfment, and degradation.","o":["True","False"],"c":0},
+{"n":110,"sec":"l3t","num":"20","q":"The five local signs of acute inflammation include redness, hotness, swelling, pain and loss of function.","o":["True","False"],"c":0},
+{"n":111,"sec":"l4m","num":"1","q":"Which of the following organisms is commonly associated with suppurative inflammation?","o":["Mycobacterium tuberculosis","Staphylococcus aureus","Plasmodium falciparum","Candida albicans"],"c":1},
+{"n":112,"sec":"l4m","num":"2","q":"Pyogenic organisms promote pus formation mainly by causing:","o":["Fibrosis without necrosis","Remarkable necrosis and neutrophil attraction","Decreased vascular permeability","Granuloma formation"],"c":1},
+{"n":113,"sec":"l4m","num":"3","q":"The main cells that accumulate in pus are:","o":["Eosinophils","Lymphocytes","Neutrophils","Plasma cells"],"c":2},
+{"n":114,"sec":"l4m","num":"4","q":"Liquefaction of necrotic tissue in suppurative inflammation is promoted by enzymes released from:","o":["Dead neutrophils","Red blood cells","Fibroblasts","Endothelial cells"],"c":0},
+{"n":115,"sec":"l4m","num":"5","q":"Pus is best described as:","o":["Clear fluid containing fibrin only","Turbid creamy fluid containing pus cells and fluid exudate","Pure blood","A collection of collagen fibers"],"c":1},
+{"n":116,"sec":"l4m","num":"6","q":"Which component is typically present in pus?","o":["Large number of neutrophils","Only lymphocytes","No necrotic material","Abundant intact fibrinogen"],"c":0},
+{"n":117,"sec":"l4m","num":"7","q":"The yellowish color of some pus may be due to:","o":["Melanin","Bacterial pigments and hemoglobin-derived pigments","Bile salts","Calcium deposits"],"c":1},
+{"n":118,"sec":"l4m","num":"8","q":"Pus caused by Staphylococcus aureus is typically:","o":["Thin and green","Creamy, thick, non-coagulable and yellowish","Clear and watery","Red and strongly coagulable"],"c":1},
+{"n":119,"sec":"l4m","num":"9","q":"Pus in streptococcal infection may be:","o":["Thin and sanguinous","Always odorless and green","Completely acellular","Calcified"],"c":0},
+{"n":120,"sec":"l4m","num":"10","q":"Localized suppurative inflammation is commonly caused by Staphylococcus aureus because it produces:","o":["Hyaluronidase","Coagulase","Streptokinase","Collagenase"],"c":1},
+{"n":121,"sec":"l4m","num":"11","q":"Coagulase contributes to localization of infection by promoting:","o":["Fibrin deposition","Fibrin dissolution","Red cell destruction","Granuloma formation"],"c":0},
+{"n":122,"sec":"l4m","num":"12","q":"Diffuse suppurative inflammation is commonly associated with Streptococcus haemolyticus, which produces:","o":["Coagulase only","Hyaluronidase and streptokinase","Insulin and glucagon","Elastin and collagen"],"c":1},
+{"n":123,"sec":"l4m","num":"13","q":"Which of the following is an example of diffuse suppurative inflammation?","o":["Abscess","Furuncle","Cellulitis","Carbuncle"],"c":2},
+{"n":124,"sec":"l4m","num":"14","q":"An abscess is defined as:","o":["Diffuse inflammation of the dermis","A cavity containing pus","A scar extending beyond an injury","A tract connecting two hollow organs"],"c":1},
+{"n":125,"sec":"l4m","num":"15","q":"The most common site of an abscess, according to the lecture, is:","o":["Subcutaneous tissue","Bone marrow","Thyroid gland","Spinal cord"],"c":0},
+{"n":126,"sec":"l4m","num":"16","q":"In the early stage of an abscess, which two zones are recognized?","o":["Fibrous and calcified zones","Central necrosis and peripheral inflammation","Central pus and outer scar only","Vascular and avascular capsules"],"c":1},
+{"n":127,"sec":"l4m","num":"17","q":"The peripheral inflammatory zone of a later abscess is called the:","o":["Granuloma","Pyogenic membrane","Keloid","Slough"],"c":1},
+{"n":128,"sec":"l4m","num":"18","q":"A small abscess may resolve by:","o":["Pus absorption followed by healing","Immediate calcification in all cases","Formation of a fistula in every case","Spread to the bloodstream"],"c":0},
+{"n":129,"sec":"l4m","num":"19","q":"Septicemia refers to:","o":["Bacterial toxins alone circulating in blood","Large numbers of virulent bacteria and their toxins circulating in blood","Localized pus in a cavity","A chronic sinus tract"],"c":1},
+{"n":130,"sec":"l4m","num":"20","q":"Multiple small abscesses in distant organs following septic emboli are characteristic of:","o":["Toxemia","Pyaemia","Cellulitis","Furunculosis"],"c":1},
+{"n":131,"sec":"l4t","num":"1","q":"Suppurative inflammation may be caused by pyogenic organisms such as staphylococci and streptococci.","o":["True","False"],"c":0},
+{"n":132,"sec":"l4t","num":"2","q":"Dead neutrophils release proteolytic enzymes that help liquefy necrotic tissue.","o":["True","False"],"c":0},
+{"n":133,"sec":"l4t","num":"3","q":"Pus normally contains no bacteria or bacterial pigments.","o":["True","False"],"c":1},
+{"n":134,"sec":"l4t","num":"4","q":"Pus is described in the lecture as non-coagulable because it lacks fibrinogen.","o":["True","False"],"c":0},
+{"n":135,"sec":"l4t","num":"5","q":"Staphylococcal pus is typically greenish in color.","o":["True","False"],"c":1},
+{"n":136,"sec":"l4t","num":"6","q":"Streptococcal infection may produce thin, sanguinous pus.","o":["True","False"],"c":0},
+{"n":137,"sec":"l4t","num":"7","q":"Localized suppurative inflammation is commonly associated with coagulase-producing Staphylococcus aureus.","o":["True","False"],"c":0},
+{"n":138,"sec":"l4t","num":"8","q":"Streptokinase promotes fibrin deposition and therefore localizes infection.","o":["True","False"],"c":1},
+{"n":139,"sec":"l4t","num":"9","q":"Cellulitis is listed as an example of diffuse suppurative inflammation.","o":["True","False"],"c":0},
+{"n":140,"sec":"l4t","num":"10","q":"An abscess is a localized suppurative inflammation characterized by a cavity containing pus.","o":["True","False"],"c":0},
+{"n":141,"sec":"l4t","num":"11","q":"Abscesses occur only in subcutaneous tissue and never in internal organs.","o":["True","False"],"c":1},
+{"n":142,"sec":"l4t","num":"12","q":"The early abscess has a central zone of necrosis and a peripheral zone of inflammation.","o":["True","False"],"c":0},
+{"n":143,"sec":"l4t","num":"13","q":"In a later abscess, the peripheral inflammatory zone is called the pyogenic membrane.","o":["True","False"],"c":0},
+{"n":144,"sec":"l4t","num":"14","q":"A large abscess usually absorbs its pus rapidly.","o":["True","False"],"c":1},
+{"n":145,"sec":"l4t","num":"15","q":"Lymphatic spread from an abscess may lead to lymphangitis and lymphadenitis.","o":["True","False"],"c":0},
+{"n":146,"sec":"l4t","num":"16","q":"Toxemia means that large numbers of virulent bacteria and toxins circulate in the blood.","o":["True","False"],"c":1},
+{"n":147,"sec":"l4t","num":"17","q":"Pyaemia may result when septic thrombi fragment and form septic emboli.","o":["True","False"],"c":0},
+{"n":148,"sec":"l4t","num":"18","q":"A sinus is a blind-ended tract between a deep abscess and the surface.","o":["True","False"],"c":0},
+{"n":149,"sec":"l4t","num":"19","q":"A fistula is a double-ended tract communicating two surfaces of hollow organs.","o":["True","False"],"c":0},
+{"n":150,"sec":"l4t","num":"20","q":"A carbuncle consists of multiple communicating deep subcutaneous abscesses that open through multiple sinuses.","o":["True","False"],"c":0}
+];
+var fl='all',fk='all',cur=[],res={};
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function byN(n){for(var i=0;i<ALL.length;i++)if(ALL[i].n==n)return ALL[i];return null}
+function render(){
+  var h='',last='';
+  cur.forEach(function(q){
+    if(q.sec!==last){last=q.sec;h+='<div class="sec">'+esc(SECS[q.sec].title)+'</div>';}
+    h+='<div class="card" id="c'+q.n+'"><div class="qh"><span class="qn">'+esc(q.num)+'</span><span class="tag">'+esc(SECS[q.sec].tag)+'</span></div>';
+    h+='<div class="qt">'+esc(q.q)+'</div><div class="opts">';
+    q.o.forEach(function(o,i){h+='<button type="button" class="opt" data-n="'+q.n+'" data-i="'+i+'"><b>'+L[i]+'</b><span>'+esc(o)+'</span></button>'});
+    h+='</div><div class="fb" id="fb'+q.n+'"></div></div>';
+  });
+  $('cards').innerHTML=h||'<div class="card" style="text-align:center">مفيش أسئلة في الاختيار ده.</div>';
+}
+function updateBar(){
+  var total=cur.length,done=0,c=0;
+  for(var k in res){done++;if(res[k])c++;}
+  $('sNum').textContent=done+'/'+total;$('sC').textContent='✅ '+c;$('sW').textContent='❌ '+(done-c);
+  $('sP').textContent='📊 '+(done?Math.round(c/done*100):0)+'%';
+  $('sFill').style.width=(total?done/total*100:0)+'%';
+  $('submitBtn').disabled=done<1;
+}
+function onClick(e){
+  var b=e.target;
+  while(b&&b!==document&&!(b.getAttribute&&b.classList&&b.classList.contains('opt')))b=b.parentNode;
+  if(!b||b===document)return;
+  var q=byN(b.getAttribute('data-n'));
+  if(!q||res[q.n]!==undefined)return;
+  var i=+b.getAttribute('data-i'),ok=(i===q.c);
+  var bs=$('c'+q.n).querySelectorAll('.opt');
+  for(var j=0;j<bs.length;j++){var x=+bs[j].getAttribute('data-i');if(x===q.c)bs[j].classList.add('right');else if(x===i)bs[j].classList.add('bad');bs[j].disabled=true;}
+  res[q.n]=ok;$('c'+q.n).className='card '+(ok?'ok':'no');
+  var fb=$('fb'+q.n);fb.className='fb '+(ok?'ok':'no');fb.style.display='block';
+  fb.innerHTML=ok?'✅ Correct!':'❌ Correct answer: <b dir="ltr">'+L[q.c]+') '+esc(q.o[q.c])+'</b>';
+  updateBar();
+}
+function start(scroll){
+  cur=ALL.filter(function(q){var s=SECS[q.sec];return (fl==='all'||s.l===fl)&&(fk==='all'||s.k===fk)});
+  res={};$('qCount').textContent=cur.length;$('result').style.display='none';
+  render();updateBar();if(scroll)window.scrollTo(0,0);
+}
+function showResults(){
+  var done=0,c=0;
+  cur.forEach(function(q){if(res[q.n]!==undefined){done++;if(res[q.n])c++;}});
+  var p=done?Math.round(c/done*100):0,left=cur.length-done;
+  $('rScore').textContent=c;$('rTotal').textContent=done;$('rC').textContent=c;$('rW').textContent=done-c;$('rP').textContent=p+'%';
+  $('rMsg').textContent=(p>=90?'ممتاز! مستواك رائع 🌟':p>=75?'جيد جداً، كمّل كده 👏':p>=50?'مستوى كويس، راجع الأخطاء وهتتحسن 💪':'محتاج مراجعة أكتر، ذاكر وجرّب تاني 📚')+(left?'  (لسه فاضل '+left+' سؤال بدون إجابة)':'');
+  var wr=cur.filter(function(q){return res[q.n]===false}),h='';
+  if(wr.length){h='<h3>📝 مراجعة الأسئلة الغلط ('+wr.length+')</h3>';wr.forEach(function(q){h+='<div class="ri"><div class="q">'+esc(SECS[q.sec].tag)+' — Q'+esc(q.num)+': '+esc(q.q)+'</div><div>✅ <b dir="ltr">'+L[q.c]+') '+esc(q.o[q.c])+'</b></div></div>';});}
+  else h='<h3>🎯 كل إجاباتك صح!</h3>';
+  $('rev').innerHTML=h;$('result').style.display='block';$('result').scrollIntoView();
+}
+function chips(id,setter){
+  var bs=document.querySelectorAll('#'+id+' .fbtn');
+  for(var i=0;i<bs.length;i++)bs[i].addEventListener('click',function(){
+    for(var j=0;j<bs.length;j++)bs[j].classList.remove('active');
+    this.classList.add('active');setter(this.getAttribute('data-v'));start(false);
+  });
+}
+function init(){
+  chips('lF',function(v){fl=v});chips('kF',function(v){fk=v});
+  document.addEventListener('click',onClick);
+  $('submitBtn').addEventListener('click',showResults);
+  $('againBtn').addEventListener('click',function(){start(true)});
+  $('topBtn').addEventListener('click',function(){window.scrollTo(0,0)});
+  start(false);
+}
+init();
+</script>
+</body>
+</html>
